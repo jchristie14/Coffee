@@ -5,7 +5,7 @@ class Excel extends Component {
   render() {
     return (
       <div className="Excel">
-        <table className="table">
+        <table className="table table-striped">
 
           <thead>
             <tr>
