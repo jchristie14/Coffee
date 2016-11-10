@@ -5,11 +5,26 @@ class Excel extends Component {
   constructor(props) {
     super(props);
     this._sort = this._sort.bind(this);
+    this._showEditor = this._showEditor.bind(this);
+    this._save = this._save.bind(this);
     this.state = {
       data: this.props.data,
       sortby: null,
       descending: false,
+      edit: null,
     };
+  }
+
+  _save(e){
+    e.preventDefault();
+    console.log('Saved');
+  }
+
+  _showEditor(e){
+    this.setState({edit: {
+      row: parseInt(e.target.dataset.row, 10),
+      cell: e.target.cellIndex,
+    }});
   }
 
   _sort(e) {
@@ -37,8 +52,7 @@ class Excel extends Component {
             <tr>
               {
                 this.props.headers.map((title, idx)=>{
-                  console.log(this)
-                    if (this.state.sortby === idx){title += this.state.descending ? '\u2191' : '\u2193'};
+                  if (this.state.sortby === idx){title += this.state.descending ? '\u2191' : '\u2193'};
                   return (
                     <th key={idx}>{title  }</th>
                   )
@@ -47,12 +61,25 @@ class Excel extends Component {
             </tr>
           </thead>
 
-          <tbody>
-            {this.state.data.map(function(row, rowIndex){
+          <tbody onDoubleClick={this._showEditor}>
+            {this.state.data.map((row, rowIndex)=>{
               return(
                 <tr key={rowIndex}>
-                 {row.map(function(cell, cellIndex){
-                    return(<td key={cellIndex}>{cell}</td>)})}
+                 {row.map((cell, cellIndex)=>{
+                    var content = cell;
+                    var edit = this.state.edit;
+                    if (edit && edit.row === rowIndex && edit.cell === cellIndex){
+                      content =
+                        <form onSubmit={this._save}>
+                          <input type='text' defaultValue={content} />
+                        
+                        </form>
+                    }
+                    return(
+                      <td 
+                        key={cellIndex}
+                        data-row={rowIndex}
+                      >{content}</td>)})}
                 </tr>
               )
             })
