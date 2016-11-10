@@ -17,7 +17,13 @@ class Excel extends Component {
 
   _save(e){
     e.preventDefault();
-    console.log('Saved');
+    var input = e.target.firstChild;
+    var data = this.state.data.slice();
+    data[this.state.edit.row][this.state.edit.cell]=input.value;
+    this.setState({
+      edit: null,
+      data: data,
+    })
   }
 
   _showEditor(e){
@@ -71,8 +77,8 @@ class Excel extends Component {
                     if (edit && edit.row === rowIndex && edit.cell === cellIndex){
                       content =
                         <form onSubmit={this._save}>
-                          <input type='text' defaultValue={content} />
-                        
+                          <textarea type='text' rows="5" defaultValue={content} ></textarea>
+                          <input type="submit"/>                       
                         </form>
                     }
                     return(
