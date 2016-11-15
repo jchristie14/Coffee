@@ -4,14 +4,21 @@ import './Excel.css';
 class Excel extends Component {
   constructor(props) {
     super(props);
+    this._renderSearch = this._renderSearch.bind(this);
+    this._renderTable = this._renderTable.bind(this);
+    this._renderToolbar = this._renderToolbar.bind(this);
+    this._search = this._search.bind(this);
     this._sort = this._sort.bind(this);
     this._showEditor = this._showEditor.bind(this);
     this._save = this._save.bind(this);
+    this._toggleSearch = this._toggleSearch.bind(this);
     this.state = {
       data: this.props.data,
       sortby: null,
       descending: false,
       edit: null,
+      search: false,
+      _preSearchData: null,
     };
   }
 
@@ -24,6 +31,23 @@ class Excel extends Component {
       edit: null,
       data: data,
     })
+  }
+
+  _search(e) {
+    var needle = e.target.value.toLowerCase();
+    if(!needle) {
+      this.setState({
+        data: this._preSearchData
+      });
+      return;
+    }
+    var idx = e.target.dataset.idx;
+    var searchdata = this._preSearchData.filter(function(row){
+      return row[idx].toString().toLowerCase().indexOf(needle) > -1;
+    });
+    this.setState({
+      data: searchdata
+    });
   }
 
   _showEditor(e){
@@ -49,7 +73,61 @@ class Excel extends Component {
     });
   }
 
+  _toggleSearch() {
+    if(this.state.search) {
+      this.setState({
+        data: this._preSearchData,
+        search: false,
+      });
+      this._preSearchData = null;
+    } else {
+      this._preSearchData = this.state.data;
+      this.setState({
+        search: true,
+      })
+    }
+  }
+
   render() {
+    return (
+      <div>
+      {this._renderToolbar()}
+      {this._renderTable()}
+      </div>
+    )
+  }
+
+  _renderSearch() {
+    if (!this.state.search){
+      return null;
+    }
+    return (
+      <tr onChange={this._search} >
+        {
+          this.props.headers.map(function(_ignore, idx){
+           return( <td
+              key={idx}
+            >
+              <input type='text' data-idx={idx} />
+            </td>)
+          })
+        }
+      </tr>
+    )
+  }
+
+  _renderToolbar() {
+    return (
+      <button
+        onClick={this._toggleSearch}
+        className="toolbar"
+      >
+        Search
+      </button>
+    );
+  }
+
+  _renderTable() {
     return (
       <div className="Excel">
         <table className="table table-striped">
@@ -68,6 +146,7 @@ class Excel extends Component {
           </thead>
 
           <tbody onDoubleClick={this._showEditor}>
+            {this._renderSearch()}
             {this.state.data.map((row, rowIndex)=>{
               return(
                 <tr key={rowIndex}>

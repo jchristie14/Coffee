@@ -18,6 +18,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="container">
+        <h1>Coffee Inventory</h1>
 
         <Excel
           headers={this.headers}
