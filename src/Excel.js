@@ -157,7 +157,7 @@ class Excel extends Component {
                       content =
                         <form onSubmit={this._save}>
                           <textarea type='text' rows="5" defaultValue={content} ></textarea>
-                          <input type="submit"/>                       
+                          <input type="submit" value="Change" />                       
                         </form>
                     }
                     return(
